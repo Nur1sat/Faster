@@ -1,0 +1,48 @@
+services:
+  fasterstore-1:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: fasterstore:local
+    container_name: fasterstore-1
+    ports:
+      - "9001:9000"
+    environment:
+      FS_BIND_ADDR: "0.0.0.0:9000"
+      FS_ADVERTISE_ADDR: "http://fasterstore-1:9000"
+      FS_DATA_DIR: "/data"
+      FS_AUTH_ENABLED: "true"
+      FS_ACCESS_KEY: "${FS_ACCESS_KEY:-faster}"
+      FS_SECRET_KEY: "${FS_SECRET_KEY:-faster-secret-key}"
+      FS_ADMIN_ACCESS_KEY: "${FS_ADMIN_ACCESS_KEY:-faster}"
+      FS_INTERNAL_TOKEN: "${FS_INTERNAL_TOKEN:-shared-cluster-token}"
+      FS_REPLICATION_PEERS: "http://fasterstore-2:9000"
+      FS_LOG_JSON: "true"
+    volumes:
+      - fasterstore_node1_data:/data
+
+  fasterstore-2:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: fasterstore:local
+    container_name: fasterstore-2
+    ports:
+      - "9002:9000"
+    environment:
+      FS_BIND_ADDR: "0.0.0.0:9000"
+      FS_ADVERTISE_ADDR: "http://fasterstore-2:9000"
+      FS_DATA_DIR: "/data"
+      FS_AUTH_ENABLED: "true"
+      FS_ACCESS_KEY: "${FS_ACCESS_KEY:-faster}"
+      FS_SECRET_KEY: "${FS_SECRET_KEY:-faster-secret-key}"
+      FS_ADMIN_ACCESS_KEY: "${FS_ADMIN_ACCESS_KEY:-faster}"
+      FS_INTERNAL_TOKEN: "${FS_INTERNAL_TOKEN:-shared-cluster-token}"
+      FS_REPLICATION_PEERS: "http://fasterstore-1:9000"
+      FS_LOG_JSON: "true"
+    volumes:
+      - fasterstore_node2_data:/data
+
+volumes:
+  fasterstore_node1_data:
+  fasterstore_node2_data:

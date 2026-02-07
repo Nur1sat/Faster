@@ -1,0 +1,24 @@
+services:
+  fasterstore:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: fasterstore:local
+    container_name: fasterstore-single
+    ports:
+      - "9000:9000"
+    environment:
+      FS_BIND_ADDR: "0.0.0.0:9000"
+      FS_ADVERTISE_ADDR: "http://fasterstore:9000"
+      FS_DATA_DIR: "/data"
+      FS_AUTH_ENABLED: "true"
+      FS_ACCESS_KEY: "${FS_ACCESS_KEY:-faster}"
+      FS_SECRET_KEY: "${FS_SECRET_KEY:-faster-secret-key}"
+      FS_ADMIN_ACCESS_KEY: "${FS_ADMIN_ACCESS_KEY:-faster}"
+      FS_INTERNAL_TOKEN: "${FS_INTERNAL_TOKEN:-internal-replication-token}"
+      FS_LOG_JSON: "true"
+    volumes:
+      - fasterstore_single_data:/data
+
+volumes:
+  fasterstore_single_data:

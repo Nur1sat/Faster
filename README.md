@@ -57,6 +57,8 @@ FasterStore is a single process with strongly separated internal modules:
 ├── Cargo.toml
 ├── Dockerfile
 ├── README.md
+├── docs/
+│   └── minio-comparison.md
 ├── examples/
 │   └── basic_benchmark.rs
 └── src/
@@ -196,18 +198,21 @@ Internal replication calls use:
 - Configurable cache capacity and per-object cache size caps.
 - Streamed ingest with spool threshold.
 
-## Comparison: FasterStore vs MinIO
+## Comparison Snapshot: FasterStore vs MinIO (As of February 7, 2026)
 
 | Dimension | FasterStore | MinIO (baseline) |
 |---|---|---|
 | Core runtime | Rust single binary | Go single binary |
-| Metadata dependency | Embedded custom WAL+snapshot (no external DB) | Internal metadata system |
+| Metadata dependency | Embedded custom WAL+snapshot (no external DB) | Internal distributed metadata path |
 | Small-file path | In-memory threshold + append-only CAS path tuned for low overhead | General-purpose path |
 | Multipart complete | Manifest commit (no full object rewrite) | Multipart support (implementation differs) |
 | Startup behavior | Snapshot + WAL replay, no payload scans | Deployment-dependent |
 | Resource profile | Designed for lower steady-state memory with bounded cache | Good but often tuned per deployment |
 | Replication | Built-in async peer control API | Built-in distributed/replication features |
 | Config simplicity | Env-driven minimal surface | Broader feature surface |
+
+Detailed, source-checked comparison and roadmap:
+`docs/minio-comparison.md`
 
 ## Configuration (Environment Variables)
 
@@ -250,6 +255,46 @@ Server starts on `http://127.0.0.1:9000` unless overridden.
 ```bash
 docker build -t fasterstore:latest .
 docker run --rm -p 9000:9000 -v $(pwd)/data:/data fasterstore:latest
+```
+
+## Docker Example Setup
+
+### 1. Single Node (docker compose)
+
+```bash
+docker compose --env-file examples/docker/.env.example -f examples/docker/docker-compose.single.yml up --build -d
+```
+
+Endpoints:
+
+- API: `http://127.0.0.1:9000`
+- Metrics: `http://127.0.0.1:9000/metrics`
+- Health: `http://127.0.0.1:9000/healthz`
+
+Stop:
+
+```bash
+docker compose -f examples/docker/docker-compose.single.yml down -v
+```
+
+### 2. Two-Node Replication Example
+
+```bash
+docker compose --env-file examples/docker/.env.example -f examples/docker/docker-compose.cluster.yml up --build -d
+```
+
+Endpoints:
+
+- Node 1: `http://127.0.0.1:9001`
+- Node 2: `http://127.0.0.1:9002`
+
+In this setup, each node is configured with the other as a replication peer through
+`FS_REPLICATION_PEERS`.
+
+Stop:
+
+```bash
+docker compose -f examples/docker/docker-compose.cluster.yml down -v
 ```
 
 ## Basic Benchmark Example

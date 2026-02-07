@@ -52,10 +52,10 @@ pub fn build_router(state: AppState) -> Router {
         .route("/readyz", get(readyz))
         .route("/metrics", get(metrics))
         .route(
-            "/_admin/policy/:bucket",
+            "/_admin/policy/{bucket}",
             get(get_bucket_policy).put(set_bucket_policy),
         )
-        .route("/_internal/blob/:hash", get(internal_get_blob))
+        .route("/_internal/blob/{hash}", get(internal_get_blob))
         .route(
             "/_internal/replicate/object",
             post(internal_replicate_object),
@@ -65,7 +65,7 @@ pub fn build_router(state: AppState) -> Router {
             post(internal_replicate_delete),
         )
         .route(
-            "/:bucket/*key",
+            "/{bucket}/{*key}",
             put(put_object_or_part)
                 .get(get_object)
                 .delete(delete_object_or_abort)
