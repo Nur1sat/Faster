@@ -361,3 +361,20 @@ cargo run --release --example basic_benchmark
 ## Current Scope
 
 This repository implements the core object path and operational primitives with a performance-first architecture. Additional S3 surface area (broader bucket management semantics, compatibility edge cases, and optional gRPC control plane) can be layered on top without changing the storage/metadata core.
+
+## CI/CD
+
+GitHub Actions workflows are included:
+
+- `CI` (`.github/workflows/ci.yml`)
+  - Runs on pushes to `main` and pull requests
+  - Enforces formatting, clippy, tests, and release build
+- `CD` (`.github/workflows/cd.yml`)
+  - Runs on pushes to `main`, version tags (`v*.*.*`), and manual dispatch
+  - Builds and publishes Docker images to GHCR: `ghcr.io/<owner>/<repo>`
+
+Dependabot is configured in `.github/dependabot.yml` to keep Cargo and GitHub Actions dependencies updated weekly.
+
+## License
+
+Licensed under Apache-2.0. See `LICENSE`.
