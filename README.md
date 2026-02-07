@@ -54,13 +54,21 @@ FasterStore is a single process with strongly separated internal modules:
 
 ```text
 .
+├── .env.example
 ├── Cargo.toml
 ├── Dockerfile
+├── Makefile
 ├── README.md
 ├── docs/
 │   └── minio-comparison.md
 ├── examples/
 │   └── basic_benchmark.rs
+├── scripts/
+│   ├── fs-common.sh
+│   ├── fs-delete.sh
+│   ├── fs-get.sh
+│   ├── fs-health.sh
+│   └── fs-put.sh
 └── src/
     ├── api/
     │   └── mod.rs
@@ -249,6 +257,30 @@ cargo run --release
 ```
 
 Server starts on `http://127.0.0.1:9000` unless overridden.
+
+## Effortless Local Connect
+
+These files are included to make local usage one-command:
+
+- `.env.example` - defaults for endpoint and credentials
+- `Makefile` - shortcuts for run/check/test/health/object operations
+- `scripts/fs-*.sh` - signed API helpers for PUT/GET/DELETE
+
+Quick start:
+
+```bash
+cp .env.example .env
+make run
+```
+
+In another terminal:
+
+```bash
+make health
+make put FILE=README.md BUCKET=bench KEY=hello.txt
+make get BUCKET=bench KEY=hello.txt OUT=/tmp/hello.txt
+make delete BUCKET=bench KEY=hello.txt
+```
 
 ## Docker
 
