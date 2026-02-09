@@ -67,3 +67,41 @@ impl From<serde_json::Error> for AppError {
         Self::Internal(value.to_string())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn status_mapping_matches_error_variant() {
+        let cases = [
+            (
+                AppError::BadRequest("x".to_string()),
+                StatusCode::BAD_REQUEST,
+            ),
+            (
+                AppError::Unauthorized("x".to_string()),
+                StatusCode::UNAUTHORIZED,
+            ),
+            (AppError::Forbidden("x".to_string()), StatusCode::FORBIDDEN),
+            (AppError::NotFound("x".to_string()), StatusCode::NOT_FOUND),
+            (AppError::RateLimited, StatusCode::TOO_MANY_REQUESTS),
+            (
+                AppError::Storage("x".to_string()),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            ),
+            (
+                AppError::Replication("x".to_string()),
+                StatusCode::BAD_GATEWAY,
+            ),
+            (
+                AppError::Internal("x".to_string()),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            ),
+        ];
+
+        for (err, expected_status) in cases {
+            assert_eq!(err.status(), expected_status);
+        }
+    }
+}
