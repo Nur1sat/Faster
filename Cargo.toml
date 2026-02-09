@@ -11,7 +11,7 @@ anyhow = "1.0"
 async-trait = "0.1"
 async-stream = "0.3"
 axum = { version = "0.8", features = ["macros", "multipart"] }
-axum-server = { version = "0.7", features = ["tls-rustls"] }
+axum-server = { version = "0.8", features = ["tls-rustls"] }
 base64 = "0.22"
 blake3 = "1.8"
 bytes = "1.10"
